@@ -326,6 +326,9 @@ int set_std_osd_attr(struct osd_priv *priv, struct attr*the_attr) {
         } else if(attr_font_size == the_attr->type) {
             opc->osd_item.font_size = the_attr->u.num;
             attr_set=1;
+        } else if (attr_active == the_attr->type) {
+            opc->osd_item.active = the_attr->u.num;
+            attr_set=1;
         }
         if(attr_set && opc->osd_item.gr) {
             osd_std_calculate_sizes(&opc->osd_item, navit_get_width(opc->osd_item.navit), navit_get_height(opc->osd_item.navit));
@@ -369,6 +372,9 @@ static void osd_route_guard_draw(struct osd_priv_common *opc, struct navit *nav,
     struct graphics_gc *curr_color;
     int imperial=0;
     double min_dist;
+
+    if (!opc->osd_item.active) 
+        return;
 
     //do not execute for each gps update
     gettimeofday(&tv,NULL);
@@ -1597,6 +1603,9 @@ static void osd_button_adjust_sizes(struct osd_priv_common *opc, struct graphics
 
 static void osd_button_draw(struct osd_priv_common *opc, struct navit *nav, struct vehicle * unused) {
     struct osd_button *this = (struct osd_button *)opc->data;
+
+    if (!opc->osd_item.active) 
+        return;
 
     // FIXME: Do we need this check?
     if(navit_get_blocked(nav)&1)

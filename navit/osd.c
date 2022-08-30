@@ -375,7 +375,7 @@ void osd_std_config(struct osd_item *item, struct navit *navit) {
             attr.u.num=-1;
         item->configured = !!(attr.u.num & item->osd_configuration);
     }
-
+    item->active = 1;
     if (item->gr && !(item->flags & DISABLE_OVERLAY))
         graphics_overlay_disable(item->gr, !item->configured);
 }

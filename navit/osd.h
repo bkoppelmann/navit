@@ -45,6 +45,7 @@ struct osd_item {
 	struct osd_item_methods meth;
 	int flags, w, h, fg_line_width, font_size, osd_configuration, configured;
 	int rel_w, rel_h, rel_x, rel_y;
+    int active;
 	struct color color_bg, color_fg, text_color;
 	struct navit *navit;
 	struct graphics *gr;
