@@ -81,6 +81,7 @@ struct osd_priv_common {
 struct odometer;
 
 int set_std_osd_attr(struct osd_priv *priv, struct attr*the_attr);
+int get_std_osd_attr(struct osd_priv *priv, enum attr_type type, struct attr*the_attr);
 static void osd_odometer_reset(struct osd_priv_common *opc, int flags);
 static int osd_cmd_odometer_reset(struct navit *this, char *function, struct attr **in, struct attr ***out);
 static void osd_odometer_draw(struct osd_priv_common *opc, struct navit *nav, struct vehicle *v);
@@ -307,6 +308,39 @@ static char *format_float_0(double num) {
     return g_strdup_printf("%.0f", num);
 }
 
+int get_std_osd_attr(struct osd_priv *priv, enum attr_type type, struct attr*the_attr) {
+    struct osd_priv_common *opc=(struct osd_priv_common *)priv;
+    if(opc && the_attr && ATTR_IS_INT(type)) {
+        printf("Reached\n");
+        if (type == attr_w) {
+            the_attr->type = attr_w;
+            the_attr->u.num = opc->osd_item.rel_w;
+            return 1;
+        } else if (type == attr_h) {
+            the_attr->type = attr_h;
+            the_attr->u.num = opc->osd_item.rel_h;
+            return 1;
+        } else if (type == attr_x) {
+            the_attr->type = attr_x;
+            the_attr->u.num = opc->osd_item.rel_x;
+            return 1;
+        } else if (type == attr_y) {
+            the_attr->type = attr_y;
+            the_attr->u.num = opc->osd_item.rel_y;
+            return 1;
+        } else if (type == attr_font_size) {
+            the_attr->type = attr_font_size;
+            the_attr->u.num = opc->osd_item.font_size;
+            return 1;
+        } else if (type == attr_active) {
+            the_attr->type = attr_active;
+            the_attr->u.num = opc->osd_item.active;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int set_std_osd_attr(struct osd_priv *priv, struct attr*the_attr) {
     struct osd_priv_common *opc=(struct osd_priv_common *)priv;
     if(opc && the_attr && ATTR_IS_INT(the_attr->type)) {
@@ -373,7 +407,7 @@ static void osd_route_guard_draw(struct osd_priv_common *opc, struct navit *nav,
     int imperial=0;
     double min_dist;
 
-    if (!opc->osd_item.active) 
+    if (!opc->osd_item.active)
         return;
 
     //do not execute for each gps update
@@ -1604,7 +1638,7 @@ static void osd_button_adjust_sizes(struct osd_priv_common *opc, struct graphics
 static void osd_button_draw(struct osd_priv_common *opc, struct navit *nav, struct vehicle * unused) {
     struct osd_button *this = (struct osd_button *)opc->data;
 
-    if (!opc->osd_item.active) 
+    if (!opc->osd_item.active)
         return;
 
     // FIXME: Do we need this check?
