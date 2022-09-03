@@ -127,8 +127,6 @@ void osd_std_click(struct osd_item *this, struct navit *nav, int pressed, int bu
     struct point bp = this->p;
     if (!this->command || !this->command[0])
         return;
-    if (!this->active)
-        return;
 
     osd_wrap_point(&bp, nav);
     click_is_outside_item = p->x < bp.x || p->y < bp.y || p->x > bp.x + this->w || p->y > bp.y + this->h;
