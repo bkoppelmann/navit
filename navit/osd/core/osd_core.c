@@ -3716,7 +3716,6 @@ static void osd_volume_click(struct osd_priv_common *opc, struct navit *nav, int
     if ((p->x < bp.x || p->y < bp.y || p->x > bp.x + opc->osd_item.w || p->y > bp.y + opc->osd_item.h)
             && !opc->osd_item.pressed)
         return;
-    navit_ignore_button(nav);
     if (pressed) {
         if (p->y - bp.y < opc->osd_item.h/2)
             this->strength++;
