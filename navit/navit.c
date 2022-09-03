@@ -202,6 +202,7 @@ static int navit_set_attr_do(struct navit *this_, struct attr *attr, int init);
 static int navit_get_cursor_pnt(struct navit *this_, struct point *p, int keep_orientation, int *dir);
 static void navit_set_cursors(struct navit *this_);
 static int navit_cmd_zoom_to_route(struct navit *this, char *function, struct attr **in, struct attr ***out);
+static int navit_cmd_zoom_to_val(struct navit *this, char *function, struct attr **in, struct attr ***out);
 static int navit_cmd_set_center_cursor(struct navit *this_, char *function, struct attr **in, struct attr ***out);
 static int navit_cmd_announcer_toggle(struct navit *this_, char *function, struct attr **in, struct attr ***out);
 static void navit_set_vehicle(struct navit *this_, struct navit_vehicle *nv);
@@ -1444,6 +1445,7 @@ static struct command_table commands[] = {
     {"zoom_in",command_cast(navit_cmd_zoom_in)},
     {"zoom_out",command_cast(navit_cmd_zoom_out)},
     {"zoom_to_route",command_cast(navit_cmd_zoom_to_route)},
+    {"zoom_to_val",command_cast(navit_cmd_zoom_to_val)},
     {"say",command_cast(navit_cmd_say)},
     {"set_center",command_cast(navit_cmd_set_center)},
     {"set_center_cursor",command_cast(navit_cmd_set_center_cursor)},
@@ -2328,10 +2330,27 @@ void navit_zoom_to_route(struct navit *this_, int orientation) {
     navit_zoom_to_rect(this_, &r);
 }
 
+static void navit_zoom_to_val(struct navit *this_, int val) {
+    struct point p;
+    if (this_->vehicle && this_->vehicle->follow_curr <= 1 && navit_get_cursor_pnt(this_, &p, 0, NULL)) {
+        navit_scale(this_, val, &p, 1);
+    } else {
+        navit_scale(this_, val, NULL, 1);
+    }
+}
+
+
 static int navit_cmd_zoom_to_route(struct navit *this, char *function, struct attr **in, struct attr ***out) {
     navit_zoom_to_route(this, 0);
     return 0;
 }
+
+static int navit_cmd_zoom_to_val(struct navit *this, char *function, struct attr **in, struct attr ***out) {
+    if (in && in[0] && ATTR_IS_INT(in[0]->type))
+        navit_zoom_to_val(this, in[0]->u.num);
+    return 0;
+}
+
 
 
 /**
