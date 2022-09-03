@@ -3637,7 +3637,7 @@ static void osd_volume_draw(struct osd_priv_common *opc, struct navit *navit, st
         if (gr_image) {
             p.x = (opc->osd_item.w - gr_image->width) / 2;
             p.y = (opc->osd_item.h - gr_image->height) / 2;
-            graphics_draw_image(opc->osd_item.gr, opc->osd_item.graphic_fg, &p, gr_image);
+            graphics_draw_image(opc->osd_item.gr, opc->osd_item.graphic_bg, &p, gr_image);
             graphics_image_free(opc->osd_item.gr, gr_image);
         }
         g_free(image);
@@ -3702,13 +3702,14 @@ static struct osd_priv *osd_volume_new(struct navit *nav, struct osd_methods *me
     opc->osd_item.font_size = 200;
     opc->osd_item.meth.draw = osd_draw_cast(osd_volume_draw);
     meth->set_attr = set_std_osd_attr;
+    meth->get_attr = get_std_osd_attr;
 
     osd_set_std_attr(attrs, &opc->osd_item, 0);
 
     this->icon_w = -1;
     this->icon_h = -1;
     this->active = -1;
-    this->strength = -1;
+    this->strength = 0;
 
     attr = attr_search(attrs, attr_icon_w);
     if (attr)
