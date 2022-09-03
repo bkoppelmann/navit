@@ -3653,7 +3653,7 @@ struct volume {
     char *icon_src;
     int icon_h, icon_w, active;
     int strength;
-    char *shell_cmd;
+    char *cmd_get, *cmd_set;
     struct callback *click_cb;
 };
 
@@ -3679,13 +3679,35 @@ static void osd_volume_draw(struct osd_priv_common *opc, struct navit *navit, st
     graphics_draw_mode(opc->osd_item.gr, draw_mode_end);
 }
 
-static void osd_volume_alsa_set(struct volume *this) {
+static void osd_volume_set(struct volume *this) {
     char buf[128];
-    if (!this->shell_cmd)
+    if (!this->cmd_set)
         return;
-    sprintf(buf, this->shell_cmd, this->strength * 20); 
+    sprintf(buf, this->cmd_set, this->strength * 20);
     system(buf);
 }
+
+static int osd_volume_get(struct volume *this) {
+    FILE *fp;
+    char buf[32];
+    if (!this->cmd_get)
+        return 0;
+
+    fp = popen(this->cmd_get, "r");
+    if (fp == NULL) {
+       dbg(lvl_error, "Failed to run command '%s'\n", this->cmd_get);
+       return 0;
+    }
+
+    if (fgets(buf, sizeof(buf), fp) == NULL) {
+       dbg(lvl_error, "Failed to read results of command '%s'\n", this->cmd_get);
+       return 0;
+    }
+
+    pclose(fp);
+    return atoi(buf);
+}
+
 
 static void osd_volume_click(struct osd_priv_common *opc, struct navit *nav, int pressed, int button, struct point *p) {
     struct volume *this = (struct volume *)opc->data;
@@ -3705,7 +3727,7 @@ static void osd_volume_click(struct osd_priv_common *opc, struct navit *nav, int
         if (this->strength > 5)
             this->strength=5;
 
-        osd_volume_alsa_set(this); 
+        osd_volume_set(this);
         osd_volume_draw(opc, nav, NULL);
     }
 }
@@ -3743,7 +3765,6 @@ static struct osd_priv *osd_volume_new(struct navit *nav, struct osd_methods *me
     this->icon_w = -1;
     this->icon_h = -1;
     this->active = -1;
-    this->strength = 0;
 
     attr = attr_search(attrs, attr_icon_w);
     if (attr)
@@ -3753,9 +3774,13 @@ static struct osd_priv *osd_volume_new(struct navit *nav, struct osd_methods *me
     if (attr)
         this->icon_h = attr->u.num;
 
-    attr = attr_search(attrs, attr_shell);
+    attr = attr_search(attrs, attr_cmd_set);
     if (attr)
-        this->shell_cmd = attr->u.str;
+        this->cmd_set = attr->u.str;
+
+    attr = attr_search(attrs, attr_cmd_get);
+    if (attr)
+        this->cmd_get = attr->u.str;
 
     attr = attr_search(attrs, attr_icon_src);
     if (attr) {
@@ -3769,6 +3794,8 @@ static struct osd_priv *osd_volume_new(struct navit *nav, struct osd_methods *me
         this->icon_src = graphics_icon_path("gui_strength_%d_32_32.png");
 
     navit_add_callback(nav, callback_new_attr_1(callback_cast(osd_volume_init), attr_graphics_ready, opc));
+
+    this->strength = osd_volume_get(this);
     return (struct osd_priv *) opc;
 }
 
