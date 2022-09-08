@@ -318,13 +318,11 @@ ATTR(gpsd_query)
 ATTR(on_eof)
 ATTR(command)
 ATTR(src)
-ATTR(cmd_get)
-ATTR(cmd_set)
 ATTR(path)
 ATTR(font)
 ATTR(url_local)
-ATTR_UNUSED
-ATTR_UNUSED
+ATTR(cmd_get)
+ATTR(cmd_set)
 ATTR_UNUSED
 ATTR(icon_src)
 ATTR(position_time_iso8601)
