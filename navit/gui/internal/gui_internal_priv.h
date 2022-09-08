@@ -93,6 +93,8 @@ struct gui_priv {
     struct callback * vehicle_cb;
     struct route_data route_data;		/**< Stores information about the route. */
 
+    const char *selected_town;
+
     struct gui_internal_data data;
     struct callback_list *cbl;
     int flags;
@@ -206,7 +208,7 @@ void gui_internal_select_waypoint(struct gui_priv *this, const char *title, cons
 void gui_internal_call_linked_on_finish(struct gui_priv *this, struct widget *wm, void *data);
 char *removecase(char *s);
 void gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, struct coord_geo *g_in,
-                                  struct widget *wm, const char *name, int flags);
+                                  struct widget *wm, const char *name, int flags, long curr_item);
 void gui_internal_cmd_position(struct gui_priv *this, struct widget *wm, void *data);
 void gui_internal_cmd_bookmarks(struct gui_priv *this, struct widget *wm, void *data);
 void gui_internal_keypress_do(struct gui_priv *this, char *key);

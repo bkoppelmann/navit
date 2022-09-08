@@ -900,7 +900,7 @@ static int gui_internal_cmd2_position(struct gui_priv *this, char *function, str
             flags=in[2]->u.num;
     }
     dbg(lvl_debug,"flags=0x%x",flags);
-    gui_internal_cmd_position_do(this, NULL, in[0]->u.coord_geo, NULL, name, flags);
+    gui_internal_cmd_position_do(this, NULL, in[0]->u.coord_geo, NULL, name, flags, 0);
     return 0;
 }
 

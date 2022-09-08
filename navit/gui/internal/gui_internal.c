@@ -1007,6 +1007,19 @@ static void gui_internal_cmd_delete_waypoint(struct gui_priv *this, struct widge
     gui_internal_prune_menu(this, NULL);
 }
 
+static char *gui_internal_destination_description(struct gui_priv *this, long current_item, const char *name) {
+    switch (current_item) {
+    case 5:
+        return g_strdup_printf("%s, %s", this->selected_town, name);
+    case 6: 
+        return g_strdup_printf("%s, %s", this->selected_town, name);
+    case 9:
+        return g_strdup_printf("%s, %s", this->selected_town, name);
+    default:
+        return g_strdup_printf("%s", name);
+    }
+}
+
 
 /**
  * @brief Displays the commands available for a location.
@@ -1039,11 +1052,12 @@ static void gui_internal_cmd_delete_waypoint(struct gui_priv *this, struct widge
  * TODO define constants for these values
  */
 void gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, struct coord_geo *g_in,
-                                  struct widget *wm, const char *name, int flags) {
+                                  struct widget *wm, const char *name, int flags, long curr_item) {
     struct widget *wb,*w,*wtable,*row,*wc,*wbc,*wclosest=NULL;
     struct coord_geo g;
     struct pcoord pc;
     struct coord c;
+    const char *desc=NULL;
 
     if (pc_in) {
         pc=*pc_in;
@@ -1123,10 +1137,12 @@ void gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, s
     if (flags & 8) {
         gui_internal_widget_append(wtable,row=gui_internal_widget_table_row_new(this,
                                               gravity_left|orientation_horizontal|flags_fill));
+        desc = gui_internal_destination_description(this, curr_item, name);
         gui_internal_widget_append(row,
                                    wbc=gui_internal_button_new_with_callback(this, _("Set as destination"),
                                            image_new_xs(this, "gui_active"), gravity_left_center|orientation_horizontal|flags_fill,
-                                           gui_internal_cmd_set_destination, g_strdup(name)));
+                                           gui_internal_cmd_set_destination, g_strdup(desc)));
+        g_free(desc);
         wbc->data_free=g_free_func;
         wbc->c=pc;
         if(navit_get_destination_count(this->nav)>=1) {
@@ -1344,11 +1360,13 @@ void gui_internal_cmd_position_do(struct gui_priv *this, struct pcoord *pc_in, s
 
 void gui_internal_cmd_position(struct gui_priv *this, struct widget *wm, void *data) {
     int flags;
+    long item_type; 
 
     if(!data)
         data=wm->data;
+    item_type = (long)data;
 
-    switch ((long) data) {
+    switch (item_type) {
     case 0:
         flags=8|16|32|64|128|256;
         break;
@@ -1361,6 +1379,7 @@ void gui_internal_cmd_position(struct gui_priv *this, struct widget *wm, void *d
     case 3:
         flags=1|4|8|16|32|64|128|2048;
         flags &= this->flags_town;
+        this->selected_town = wm->name;
         break;
     case 4:
         gui_internal_search_town_in_country(this, wm);
@@ -1393,7 +1412,7 @@ void gui_internal_cmd_position(struct gui_priv *this, struct widget *wm, void *d
         gui_internal_cmd_set_destination(this, wm, NULL);
         return;
     }
-    gui_internal_cmd_position_do(this, &wm->c, NULL, wm, wm->name ? wm->name : wm->text, flags);
+    gui_internal_cmd_position_do(this, &wm->c, NULL, wm, wm->name ? wm->name : wm->text, flags, item_type);
 }
 
 
