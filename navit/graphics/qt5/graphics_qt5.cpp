@@ -1018,6 +1018,10 @@ static struct graphics_priv* graphics_qt5_new(struct navit* nav, struct graphics
 #else
     navit_app = new QGuiApplication(graphics_priv->argc, graphics_priv->argv);
 #endif
+    QCursor cursor(Qt::BlankCursor);
+    QApplication::setOverrideCursor(cursor);
+    QApplication::changeOverrideCursor(cursor);
+
     navit_app->setOrganizationName(QStringLiteral("org.navitproject"));
     navit_app->setApplicationName(QStringLiteral("navit"));
 
@@ -1124,10 +1128,7 @@ static struct graphics_priv* graphics_qt5_new(struct navit* nav, struct graphics
         graphics_priv->pixmap->fill(Qt::black);
     }
 
-    QCursor cursor(Qt::BlankCursor);
-    QApplication::setOverrideCursor(cursor);
-    QApplication::changeOverrideCursor(cursor);
-
+    
     /* tell Navit our geometry */
     resize_callback(graphics_priv, graphics_priv->pixmap->width(), graphics_priv->pixmap->height());
 
